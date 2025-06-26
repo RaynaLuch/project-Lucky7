@@ -8,6 +8,9 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import dotenv from 'dotenv';
 import { getEnvVar } from './utils/getEnvVar.js';
 
+import auth from './routers/auth.js';
+import cookieParser from 'cookie-parser';
+
 dotenv.config();
 const PORT = Number(getEnvVar('PORT', '3000'));
 
@@ -16,6 +19,7 @@ export const startServer = () => {
 
   app.use(express.json());
   app.use(cors());
+  app.use(cookieParser());
 
   app.use(
     pino({
@@ -31,6 +35,8 @@ export const startServer = () => {
     });
   });
 
+  app.use('/auth', auth);
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 
@@ -38,3 +44,5 @@ export const startServer = () => {
     console.log(`Server is running on port ${PORT}`);
   });
 };
+
+startServer();
