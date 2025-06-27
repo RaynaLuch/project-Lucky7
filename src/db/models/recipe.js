@@ -1,5 +1,8 @@
 import { model, Schema } from 'mongoose';
 
-const recipesSchema = new Schema({});
+const recipeSchema = new Schema({
+  name: String,
+  ingredients: [String],
+});
 
-export const Recipe = model('recipes', recipesSchema);
+export const Recipe = model('recipes', recipeSchema);
