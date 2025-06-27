@@ -1,12 +1,13 @@
 import { Recipe } from '../db/models/recipe.js';
-import { UserCollection as User } from '../db/models/user.js';
+import { UserCollection } from '../db/models/user.js';
+import { getOwnRecipes } from '../services/recipesServices.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
     const recipeId = req.params.id;
     const userId = req.user._id;
 
-    const user = await User.findById(userId);
+    const user = await UserCollection.findById(userId);
     const recipe = await Recipe.findById(recipeId);
 
     if (!recipe) {
@@ -27,10 +28,22 @@ export const addRecipeToFavorites = async (req, res, next) => {
 export const getFavoriteRecipes = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).populate('favorites');
+    const user = await UserCollection.findById(userId).populate('favorites');
 
     res.status(200).json(user.favorites);
   } catch (error) {
     next(error);
   }
+};
+
+export const getOwnRecipesController = async (req, res) => {
+  const ownRecipes = await getOwnRecipes({
+    userId: req.user._id,
+  });
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully found own recipes!',
+    data: ownRecipes,
+  });
 };

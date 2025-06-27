@@ -1,5 +1,10 @@
-const express = require('express');
-const router = express.Router();
-const auth = require('../../middlewares/authenticate');
+import express from 'express';
+import { authenticate } from '../../middlewares/authenticate.js';
+import { getCurrentUserController } from '../../controllers/currentUser.js';
 
-router.use(auth);
+const router = express.Router();
+
+router.use(authenticate);
+router.get("/", getCurrentUserController);
+
+export default router;

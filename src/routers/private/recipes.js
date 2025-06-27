@@ -1,10 +1,20 @@
 import express from 'express';
-import { addRecipeToFavorites, getFavoriteRecipes } from '../../controllers/recipesController.js';
-import { authenticate as auth } from '../../middlewares/authenticate.js';
+import { authenticate } from '../../middlewares/authenticate.js';
+import {
+  addRecipeToFavorites,
+  getFavoriteRecipes,
+  getOwnRecipesController,
+} from '../../controllers/recipesController.js';
+import { ctrlWrapper } from '../../utils/ctrlWrapper.js';
 
 const router = express.Router();
 
-router.post('/favorites/:id', auth, addRecipeToFavorites);
-router.get('/favorites', auth, getFavoriteRecipes);
+router.use(authenticate);
+
+router.post('/favorites/:id', addRecipeToFavorites);
+
+router.get('/favorites', getFavoriteRecipes);
+
+router.get('/own', ctrlWrapper(getOwnRecipesController));
 
 export default router;
