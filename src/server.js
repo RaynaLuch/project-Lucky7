@@ -8,8 +8,10 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import dotenv from 'dotenv';
 import { getEnvVar } from './utils/getEnvVar.js';
 
-import auth from './routers/auth.js';
 import cookieParser from 'cookie-parser';
+
+import auth from './routers/public/auth.js';
+const recipesRouter = require('./routers/private/recipes.js');
 
 dotenv.config();
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -29,8 +31,7 @@ export const startServer = () => {
     }),
   );
 
-  app.use('/auth', auth);
-  const recipesRouter = require('./routes/recipes');
+  app.use('api//auth', auth);
   app.use('/api/recipes', recipesRouter);
 
   app.use(notFoundHandler);
