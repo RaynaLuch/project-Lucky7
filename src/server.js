@@ -29,13 +29,9 @@ export const startServer = () => {
     }),
   );
 
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Hello world!',
-    });
-  });
-
   app.use('/auth', auth);
+  const recipesRouter = require('./routes/recipes');
+  app.use('/api/recipes', recipesRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
