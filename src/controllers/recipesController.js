@@ -1,5 +1,5 @@
-import Recipe from '../db/models/recipe.js';
-import User from '../db/models/user.js';
+import { Recipe } from '../db/models/recipe.js';
+import { UserCollection as User } from '../db/models/user.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {

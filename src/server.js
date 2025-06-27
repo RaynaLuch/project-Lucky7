@@ -11,7 +11,7 @@ import { getEnvVar } from './utils/getEnvVar.js';
 import cookieParser from 'cookie-parser';
 
 import auth from './routers/public/auth.js';
-const recipesRouter = require('./routers/private/recipes.js');
+import recipesRouter from './routers/private/recipes.js';
 
 dotenv.config();
 const PORT = Number(getEnvVar('PORT', '3000'));
