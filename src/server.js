@@ -10,9 +10,9 @@ import { getEnvVar } from './utils/getEnvVar.js';
 
 import cookieParser from 'cookie-parser';
 
-import publicAuth from './routers/public/auth.js';
-import privateRecipesRouter from './routers/private/recipes.js';
-import userRouter from './routers/private/users.js';
+import auth from './routers/auth.js';
+import recipesRouter from './routers/recipes.js';
+import userRouter from './routers/users.js';
 
 dotenv.config();
 
@@ -33,8 +33,8 @@ export const startServer = () => {
     }),
   );
 
-  app.use('/api//auth', publicAuth);
-  app.use('/api/recipes', privateRecipesRouter);
+  app.use('/api/auth', auth);
+  app.use('/api/recipes', recipesRouter);
   app.use('/api/users', userRouter);
 
   app.use(notFoundHandler);
