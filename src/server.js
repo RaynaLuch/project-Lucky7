@@ -12,6 +12,7 @@ import cookieParser from 'cookie-parser';
 
 import publicAuth from './routers/public/auth.js';
 import privateRecipesRouter from './routers/private/recipes.js';
+import userRouter from './routers/private/users.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ export const startServer = () => {
 
   app.use('/api//auth', publicAuth);
   app.use('/api/recipes', privateRecipesRouter);
+  app.use('/api/users', userRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
