@@ -1,14 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const auth = require('../../middlewares/authenticate');
-const {
+import express from 'express';
+import { authenticate } from '../../middlewares/authenticate.js';
+import {
   addRecipeToFavorites,
   getFavoriteRecipes,
   getOwnRecipesController,
-} = require('../../controllers/recipesController.js');
-const ctrlWrapper = require('../../utils/ctrlWrapper.js');
+} from '../../controllers/recipesController.js';
+import { ctrlWrapper } from '../../utils/ctrlWrapper.js';
 
-router.use(auth);
+const router = express.Router();
+
+router.use(authenticate);
 
 router.post('/favorites/:id', addRecipeToFavorites);
 
@@ -16,4 +17,4 @@ router.get('/favorites', getFavoriteRecipes);
 
 router.get('/own', ctrlWrapper(getOwnRecipesController));
 
-module.exports = router;
+export default router;
