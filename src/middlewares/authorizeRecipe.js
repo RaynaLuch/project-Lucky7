@@ -9,7 +9,7 @@ export const authorizeRecipe = async (req, res, next) => {
     return next(createHttpError(404, 'Recipe not found'));
   }
 
-  const isOwner = recipe.ownerId.toString() === req.user._id.toString();
+  const isOwner = recipe.owner.toString() === req.user._id.toString();
 
   if (!isOwner) {
     return next(createHttpError(403, 'Access denied - not your recipe'));

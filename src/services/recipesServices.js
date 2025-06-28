@@ -1,11 +1,25 @@
 import RecipeCollection from '../db/models/recipe.js';
 import { Ingredient } from '../db/models/ingredient.js';
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getOwnRecipes = async (userId) => {
-  const ownRecipes = await RecipeCollection.find(userId);
-  return ownRecipes;
+export const getOwnRecipes = async ({ page, perPage, owner }) => {
+  const skip = page > 0 ? (page - 1) * perPage : 0;
+
+  const ownRecipesQuery = await RecipeCollection.find({ owner });
+
+  const [ownRecipesCount, data] = await Promise.all([
+    RecipeCollection.countDocuments(ownRecipesQuery),
+    ownRecipesQuery.skip(skip).limit(perPage),
+  ]);
+
+  const paginationData = calculatePaginationData(
+    ownRecipesCount,
+    perPage,
+    page,
+  );
+
+  return { data, ...paginationData };
 };
-
 
 export const addRecipes = (payload) => RecipeCollection.create(payload);
 
