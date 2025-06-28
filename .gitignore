@@ -1,4 +1,8 @@
 /node_modules
+/temp/*
+!/src/temp/.gitkeep
+/uploads/*
+!/uploads/.gitkeep
 
 .env
 

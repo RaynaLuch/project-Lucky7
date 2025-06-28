@@ -1,3 +1,6 @@
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
+
 import createHttpError from 'http-errors';
 import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
@@ -8,6 +11,9 @@ import {
   getRecipeById,
   searchRecipes,
 } from '../services/recipesServices.js';
+
+import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
@@ -61,8 +67,25 @@ export const getOwnRecipesController = async (req, res) => {
 };
 
 export const addRecipesController = async (req, res) => {
+  let photoUrl = null;
+
+  if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
+    const result = await uploadToCloudinary(req.file.path);
+
+    await fs.unlink(req.file.path);
+
+    photoUrl = result.secure_url;
+  } else {
+    await fs.rename(req.file.path, path.resolve('uploads', req.file.filename));
+    photoUrl = `http://localhost:3000/photoUrl/${req.file.filename}`;
+  }
+
   const { _id: owner } = req.user;
-  const data = await addRecipes({ ...req.body, owner });
+  const data = await addRecipes({
+    ...req.body,
+    owner,
+    photoUrl,
+  });
 
   res.status(201).json({
     status: 201,
