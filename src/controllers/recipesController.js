@@ -3,8 +3,10 @@ import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
 import {
   addRecipes,
+  deleteFavoriteRecipes,
   getOwnRecipes,
   getRecipeById,
+  searchRecipes,
 } from '../services/recipesServices.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
@@ -93,4 +95,23 @@ export const getRecipeByIdController = async (req, res) => {
     message: 'Successfully found recipe by id!',
     data: foundRecipe,
   });
+};
+
+export const searchRecipesController = async (req, res, next) => {
+  try {
+    const searchData = await searchRecipes(req.query);
+    res.json(searchData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteFavoriteRecipesController = async (req, res, next) => {
+  try {
+    await deleteFavoriteRecipes(req.user.id, req.params.id);
+    res.status(204).end();
+  } catch (error) {
+    const status = error.message.includes('not') ? 404 : 500;
+    res.status(error.status || status).json({ message: error.message });
+  }
 };
