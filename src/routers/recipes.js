@@ -1,6 +1,7 @@
 import express from 'express';
 import { authenticate } from '../middlewares/authenticate.js';
 import {
+  addRecipesController,
   addRecipeToFavorites,
   getFavoriteRecipes,
   getOwnRecipesController,
@@ -18,6 +19,8 @@ router.get('/favorites', authenticate, getFavoriteRecipes);
 
 router.get('/own', authenticate, ctrlWrapper(getOwnRecipesController));
 
+router.post('/own', authenticate, ctrlWrapper(addRecipesController));
+
 router.delete(
   '/recipes/:id',
   authenticate,
@@ -26,5 +29,6 @@ router.delete(
 );
 
 router.get('/:id', ctrlWrapper(getRecipeByIdController));
+
 
 export default router;

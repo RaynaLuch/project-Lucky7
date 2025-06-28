@@ -1,5 +1,6 @@
+
 import createHttpError from 'http-errors';
-import { Recipe } from '../db/models/recipe.js';
+import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
 import { getOwnRecipes, getRecipeById } from '../services/recipesServices.js';
 
@@ -9,7 +10,7 @@ export const addRecipeToFavorites = async (req, res, next) => {
     const userId = req.user._id;
 
     const user = await UserCollection.findById(userId);
-    const recipe = await Recipe.findById(recipeId);
+    const recipe = await RecipeCollection.findById(recipeId);
 
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
@@ -49,14 +50,29 @@ export const getOwnRecipesController = async (req, res) => {
   });
 };
 
+
+export const addRecipesController = async (req, res) => {
+  const { _id: owner } = req.user;
+  const data = await addRecipes({ ...req.body, owner });
+
+  res.status(201).json({
+    status: 201,
+    message: 'Successfully add recipe',
+    data,
+  });
+
+  const validateResult = addRecipeSchema.validate(req.body);
+  console.log(validateResult);
+}
+  
 export const deleteRecipeController = async (req, res, next) => {
   const { id } = req.params;
-  const recipe = await Recipe.findById(id);
+  const recipe = await RecipeCollection.findById(id);
   if (!recipe) {
     throw createHttpError(404, 'Recipe not found');
   }
 
-  await Recipe.findByIdAndDelete(id);
+  await RecipeCollection.findByIdAndDelete(id);
   await UserCollection.updateMany(
     { favorites: id },
     { $pull: { favorites: id } },
