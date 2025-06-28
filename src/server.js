@@ -15,6 +15,7 @@ import recipesRouter from './routers/recipes.js';
 import userRouter from './routers/users.js';
 import categoriesRouter from './routers/categories.js';
 import ingredientsRouter from './routers/ingredients.js';
+import path from 'node:path';
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ const PORT = Number(getEnvVar('PORT', '3000'));
 
 export const startServer = () => {
   const app = express();
+
+  app.use('/photoUrl', express.static(path.resolve('uploads')));
 
   app.use(express.json());
   app.use(cors());

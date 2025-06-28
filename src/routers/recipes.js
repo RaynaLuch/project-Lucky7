@@ -10,6 +10,7 @@ import {
 } from '../controllers/recipesController.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authorizeRecipe } from '../middlewares/authorizeRecipe.js';
+import { upload } from '../middlewares/upload.js';
 
 const router = express.Router();
 
@@ -19,7 +20,12 @@ router.get('/favorites', authenticate, getFavoriteRecipes);
 
 router.get('/own', authenticate, ctrlWrapper(getOwnRecipesController));
 
-router.post('/own', authenticate, ctrlWrapper(addRecipesController));
+router.post(
+  '/own',
+  authenticate,
+  upload.single('photoUrl'),
+  ctrlWrapper(addRecipesController),
+);
 
 router.delete(
   '/recipes/:id',
@@ -29,6 +35,5 @@ router.delete(
 );
 
 router.get('/:id', ctrlWrapper(getRecipeByIdController));
-
 
 export default router;
