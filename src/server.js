@@ -13,6 +13,8 @@ import cookieParser from 'cookie-parser';
 import auth from './routers/auth.js';
 import recipesRouter from './routers/recipes.js';
 import userRouter from './routers/users.js';
+import categoriesRouter from './routers/categories.js';
+import ingredientsRouter from './routers/ingredients.js';
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ export const startServer = () => {
   app.use('/api/auth', auth);
   app.use('/api/recipes', recipesRouter);
   app.use('/api/users', userRouter);
+  app.use('/api/categories', categoriesRouter);
+  app.use('/api/ingredients', ingredientsRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
