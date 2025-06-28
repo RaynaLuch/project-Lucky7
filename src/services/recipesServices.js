@@ -1,7 +1,6 @@
 import RecipeCollection from '../db/models/recipe.js';
-import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { Ingredient } from '../db/models/ingredient.js';
-
+import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { Category } from '../db/models/category.js';
 
 export const getOwnRecipes = async ({ page, perPage, owner }) => {
