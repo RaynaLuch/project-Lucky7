@@ -5,6 +5,7 @@ import {
   addRecipes,
   getOwnRecipes,
   getRecipeById,
+  searchRecipes,
 } from '../services/recipesServices.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
@@ -94,3 +95,14 @@ export const getRecipeByIdController = async (req, res) => {
     data: foundRecipe,
   });
 };
+
+export const searchRecipesController = async (req, res, next) => {
+  try {
+    const searchData = await searchRecipes(req.query);
+    res.json(searchData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteFavoriteRecipesController = async (req, res, next) => {};

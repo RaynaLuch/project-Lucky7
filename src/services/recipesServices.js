@@ -1,6 +1,8 @@
 import RecipeCollection from '../db/models/recipe.js';
-import { Ingredient } from '../db/models/ingredient.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
+import { Ingredient } from '../db/models/ingredient.js';
+
+import { Category } from '../db/models/category.js';
 
 export const getOwnRecipes = async ({ page, perPage, owner }) => {
   const skip = page > 0 ? (page - 1) * perPage : 0;
@@ -33,3 +35,54 @@ export const getRecipeById = async (recipeId) => {
 
   return recipe;
 };
+
+export const searchRecipes = async ({
+  query,
+  category,
+  ingredient,
+  page = 1,
+  limit = 10,
+}) => {
+  const skip = (page - 1) * limit;
+  const filter = {};
+
+  if (query) {
+    filter.title = { $regex: query, $options: 'i' };
+  }
+
+  if (category) {
+    const foundCategory = await Category.findOne({
+      name: { $regex: category, $options: 'i' },
+    });
+    if (foundCategory) {
+      filter.category = foundCategory.name;
+    } else {
+      return { total: 0, page, limit, results: [] };
+    }
+  }
+
+  if (ingredient) {
+    const foundIngredient = await Ingredient.findOne({
+      name: { $regex: ingredient, $options: 'i' },
+    });
+    if (foundIngredient) {
+      filter['ingredients.id'] = foundIngredient._id.toString();
+    } else {
+      return { total: 0, page, limit, results: [] };
+    }
+  }
+
+  const recipes = await RecipeCollection.find(filter)
+    .skip(skip)
+    .limit(Number(limit));
+  const total = await RecipeCollection.countDocuments(filter);
+
+  return {
+    total,
+    page: Number(page),
+    limit: Number(limit),
+    results: recipes,
+  };
+};
+
+export const deleteFavoriteRecipes = async (userId, recipeId) => {};
