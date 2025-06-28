@@ -6,6 +6,7 @@ import {
   getOwnRecipes,
   getRecipeById,
 } from '../services/recipesServices.js';
+import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -42,8 +43,12 @@ export const getFavoriteRecipes = async (req, res, next) => {
 };
 
 export const getOwnRecipesController = async (req, res) => {
+  const { page, perPage } = parsePaginationParams(req.query);
+
   const ownRecipes = await getOwnRecipes({
-    userId: req.user._id,
+    page,
+    perPage,
+    owner: req.user._id,
   });
 
   res.status(200).json({
