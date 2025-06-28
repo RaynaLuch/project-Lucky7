@@ -1,3 +1,4 @@
+import createHttpError from 'http-errors';
 import { Recipe } from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
 import { getOwnRecipes } from '../services/recipesServices.js';
@@ -46,4 +47,19 @@ export const getOwnRecipesController = async (req, res) => {
     message: 'Successfully found own recipes!',
     data: ownRecipes,
   });
+};
+
+export const deleteRecipeController = async (req, res, next) => {
+  const { id } = req.params;
+  const recipe = await Recipe.findById(id);
+  if (!recipe) {
+    throw createHttpError(404, 'Recipe not found');
+  }
+
+  await Recipe.findByIdAndDelete(id);
+  await UserCollection.updateMany(
+    { favorites: id },
+    { $pull: { favorites: id } },
+  );
+  res.status(204).send();
 };
