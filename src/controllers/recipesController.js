@@ -1,8 +1,11 @@
-
 import createHttpError from 'http-errors';
 import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
-import { getOwnRecipes, getRecipeById } from '../services/recipesServices.js';
+import {
+  addRecipes,
+  getOwnRecipes,
+  getRecipeById,
+} from '../services/recipesServices.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -50,7 +53,6 @@ export const getOwnRecipesController = async (req, res) => {
   });
 };
 
-
 export const addRecipesController = async (req, res) => {
   const { _id: owner } = req.user;
   const data = await addRecipes({ ...req.body, owner });
@@ -60,11 +62,8 @@ export const addRecipesController = async (req, res) => {
     message: 'Successfully add recipe',
     data,
   });
+};
 
-  const validateResult = addRecipeSchema.validate(req.body);
-  console.log(validateResult);
-}
-  
 export const deleteRecipeController = async (req, res, next) => {
   const { id } = req.params;
   const recipe = await RecipeCollection.findById(id);
