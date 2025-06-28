@@ -3,6 +3,7 @@ import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
 import {
   addRecipes,
+  deleteFavoriteRecipes,
   getOwnRecipes,
   getRecipeById,
   searchRecipes,
@@ -105,4 +106,12 @@ export const searchRecipesController = async (req, res, next) => {
   }
 };
 
-export const deleteFavoriteRecipesController = async (req, res, next) => {};
+export const deleteFavoriteRecipesController = async (req, res, next) => {
+  try {
+    await deleteFavoriteRecipes(req.user.id, req.params.id);
+    res.status(204).end();
+  } catch (error) {
+    const status = error.message.includes('not') ? 404 : 500;
+    res.status(error.status || status).json({ message: error.message });
+  }
+};

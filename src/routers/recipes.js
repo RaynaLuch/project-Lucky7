@@ -32,7 +32,7 @@ router.delete(
   ctrlWrapper(deleteRecipeController),
 );
 router.delete(
-  '/:id/favorites',
+  '/favorites/:id',
   authenticate,
   ctrlWrapper(deleteFavoriteRecipesController),
 );

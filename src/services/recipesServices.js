@@ -2,6 +2,7 @@ import RecipeCollection from '../db/models/recipe.js';
 import { Ingredient } from '../db/models/ingredient.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { Category } from '../db/models/category.js';
+import { UserCollection } from '../db/models/user.js';
 
 export const getOwnRecipes = async ({ page, perPage, owner }) => {
   const skip = page > 0 ? (page - 1) * perPage : 0;
@@ -84,4 +85,23 @@ export const searchRecipes = async ({
   };
 };
 
-export const deleteFavoriteRecipes = async (userId, recipeId) => {};
+export const deleteFavoriteRecipes = async (userId, recipeId) => {
+  const user = await UserCollection.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  const isFavorite = user.favorites.some(
+    (favId) => favId.toString() === recipeId,
+  );
+
+  if (!isFavorite) {
+    throw new Error('Recipe not in favorites');
+  }
+
+  user.favorites = user.favorites.filter(
+    (favId) => favId.toString() !== recipeId,
+  );
+
+  await user.save();
+};
