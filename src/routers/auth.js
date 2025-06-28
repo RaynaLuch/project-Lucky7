@@ -1,15 +1,20 @@
 import { Router } from 'express';
 
-import { registerSchema } from '../validation/auth.js';
-import { loginSchema } from '../validation/auth.js';
+import { registerSchema, loginSchema } from '../validation/auth.js';
 
-import { registerUserController } from '../controllers/auth.js';
-import { loginUserController } from '../controllers/auth.js';
+import {
+  logoutUserController,
+  registerUserController,
+  loginUserController,
+  refreshUserSessionController,
+} from '../controllers/auth.js';
 
 import { validateBody } from '../middlewares/validateBody.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 import { authenticate } from '../middlewares/authenticate.js';
+import { authorizeRecipe } from '../middlewares/authorizeRecipe.js';
+import { deleteRecipeController } from '../controllers/recipesController.js';
 
 const router = Router();
 
@@ -23,6 +28,17 @@ router.post(
   '/login',
   validateBody(loginSchema),
   ctrlWrapper(loginUserController),
+);
+
+router.post('/refresh', ctrlWrapper(refreshUserSessionController));
+
+router.post('/logout', authenticate, ctrlWrapper(logoutUserController));
+
+router.delete(
+  '/recipes/:id',
+  authenticate,
+  authorizeRecipe,
+  ctrlWrapper(deleteRecipeController),
 );
 
 export default router;
