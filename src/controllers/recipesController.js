@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { Recipe } from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
-import { getOwnRecipes } from '../services/recipesServices.js';
+import { getOwnRecipes, getRecipeById } from '../services/recipesServices.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -62,4 +62,15 @@ export const deleteRecipeController = async (req, res, next) => {
     { $pull: { favorites: id } },
   );
   res.status(204).send();
+};
+
+export const getRecipeByIdController = async (req, res) => {
+  const id = req.params.id;
+  const foundRecipe = await getRecipeById(id);
+
+  res.status(200).json({
+    status: 200,
+    message: 'Successfully found recipe by id!',
+    data: foundRecipe,
+  });
 };

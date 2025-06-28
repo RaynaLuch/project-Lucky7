@@ -5,6 +5,7 @@ import {
   getFavoriteRecipes,
   getOwnRecipesController,
   deleteRecipeController,
+  getRecipeByIdController,
 } from '../controllers/recipesController.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { authorizeRecipe } from '../middlewares/authorizeRecipe.js';
@@ -23,5 +24,7 @@ router.delete(
   authorizeRecipe,
   ctrlWrapper(deleteRecipeController),
 );
+
+router.get('/:id', ctrlWrapper(getRecipeByIdController));
 
 export default router;
