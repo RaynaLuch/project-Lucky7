@@ -1,6 +1,7 @@
-import { Recipe } from '../db/models/recipe.js';
+import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
-import { getOwnRecipes } from '../services/recipesServices.js';
+import { addRecipes, getOwnRecipes } from '../services/recipesServices.js';
+import { addRecipeSchema } from '../validation/recipe.js';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -8,7 +9,7 @@ export const addRecipeToFavorites = async (req, res, next) => {
     const userId = req.user._id;
 
     const user = await UserCollection.findById(userId);
-    const recipe = await Recipe.findById(recipeId);
+    const recipe = await RecipeCollection.findById(recipeId);
 
     if (!recipe) {
       return res.status(404).json({ message: 'Recipe not found' });
@@ -46,4 +47,18 @@ export const getOwnRecipesController = async (req, res) => {
     message: 'Successfully found own recipes!',
     data: ownRecipes,
   });
+};
+
+export const addRecipesController = async (req, res) => {
+  const { _id: owner } = req.user;
+  const data = await addRecipes({ ...req.body, owner });
+
+  res.status(201).json({
+    status: 201,
+    message: 'Successfully add recipe',
+    data,
+  });
+
+  const validateResult = addRecipeSchema.validate(req.body);
+  console.log(validateResult);
 };
