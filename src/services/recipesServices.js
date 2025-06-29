@@ -7,7 +7,7 @@ import { UserCollection } from '../db/models/user.js';
 export const getOwnRecipes = async ({ page, perPage, owner }) => {
   const skip = page > 0 ? (page - 1) * perPage : 0;
 
-  const ownRecipesQuery = await RecipeCollection.find({ owner });
+  const ownRecipesQuery = RecipeCollection.find({ owner });
 
   const [ownRecipesCount, data] = await Promise.all([
     RecipeCollection.countDocuments(ownRecipesQuery),
