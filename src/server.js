@@ -17,6 +17,10 @@ import categoriesRouter from './routers/categories.js';
 import ingredientsRouter from './routers/ingredients.js';
 import path from 'node:path';
 
+import swaggerUi from 'swagger-ui-express';
+import yaml from 'yamljs';
+
+
 dotenv.config();
 
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -37,6 +41,8 @@ export const startServer = () => {
       },
     }),
   );
+    const swaggerDocument = yaml.load('./docs/swagger.yaml');
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   app.use('/api/auth', auth);
   app.use('/api/recipes', recipesRouter);

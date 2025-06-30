@@ -1,0 +1,26 @@
+
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Recipe App API',
+      version: '1.0.0',
+      description: 'API documentation for the Recipe App',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3000/api',
+      },
+    ],
+  },
+  apis: ['./routers/*.js', './controllers/*.js', './validation/*.js'], // шлях до файлів з JSDoc
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+export const setupSwagger = (app) => {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+};

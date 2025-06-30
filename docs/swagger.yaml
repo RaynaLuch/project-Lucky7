@@ -1,0 +1,771 @@
+
+openapi: 3.0.3
+info:
+  title: Recipe Website API
+  description: API for managing users, recipes, categories, and ingredients for a recipe website.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  maxLength: 16
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  maxLength: 128
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                  example: password123
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Successfully register user!
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      name:
+                        type: string
+                        example: John Doe
+                      email:
+                        type: string
+                        example: john.doe@example.com
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid request data
+  /auth/login:
+    post:
+      summary: Log in a user
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Successfully logged in an user!
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc123; sessionId=xyz789; HttpOnly; Expires=Wed, 01 Jul 2025 00:00:00 GMT
+        '400':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid credentials
+  /auth/refresh:
+    post:
+      summary: Refresh user session
+      tags:
+        - Authentication
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Session successfully refreshed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Successfully refreshed a session!
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc123; sessionId=xyz789; HttpOnly; Expires=Wed, 01 Jul 2025 00:00:00 GMT
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid or expired token
+  /auth/logout:
+    post:
+      summary: Log out a user
+      tags:
+        - Authentication
+      security:
+        - cookieAuth: []
+      responses:
+        '204':
+          description: User successfully logged out
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=; sessionId=; HttpOnly; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+  /users:
+    get:
+      summary: Get current user information
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Current user information retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      name:
+                        type: string
+                        example: John Doe
+                      email:
+                        type: string
+                        example: john.doe@example.com
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+  /categories:
+    get:
+      summary: Fetch all categories
+      tags:
+        - Categories
+      responses:
+        '200':
+          description: List of categories retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: List of categories
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        name:
+                          type: string
+                          example: Beef
+  /ingredients:
+    get:
+      summary: Fetch all ingredients
+      tags:
+        - Ingredients
+      responses:
+        '200':
+          description: List of ingredients retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: List of ingredients
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: ingredient123
+                        name:
+                          type: string
+                          example: Tomato
+  /recipes/favorites/{id}:
+    post:
+      summary: Add a recipe to favorites
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Recipe ID
+      responses:
+        '200':
+          description: Recipe added to favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe added to favorites
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe not found
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+  /recipes/favorites:
+    get:
+      summary: Get favorite recipes
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of favorite recipes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: 507f1f77bcf86cd799439011
+                    title:
+                      type: string
+                      example: Beef Stew
+                    description:
+                      type: string
+                      example: A hearty beef stew recipe
+                    favorite:
+                      type: boolean
+                      example: true
+                    time:
+                      type: string
+                      example: 1 hour
+                    calories:
+                      type: string
+                      example: 500 kcal
+                    category:
+                      type: string
+                      enum: [Beef, Dessert]
+                      example: Beef
+                    ingredients:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: ingredient123
+                          measure:
+                            type: string
+                            example: 2 cups
+                    instructions:
+                      type: string
+                      example: Cook beef, add vegetables, simmer for 1 hour
+                    owner:
+                      type: string
+                      example: 507f1f77bcf86cd799439011
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+  /recipes/own:
+    get:
+      summary: Get user's own recipes
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: perPage
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+      responses:
+        '200':
+          description: List of own recipes retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Successfully found own recipes!
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        title:
+                          type: string
+                          example: Beef Stew
+                        description:
+                          type: string
+                          example: A hearty beef stew recipe
+                        favorite:
+                          type: boolean
+                          example: false
+                        time:
+                          type: string
+                          example: 1 hour
+                        calories:
+                          type: string
+                          example: 500 kcal
+                        category:
+                          type: string
+                          enum: [Beef, Dessert]
+                          example: Beef
+                        ingredients:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: ingredient123
+                              measure:
+                                type: string
+                                example: 2 cups
+                        instructions:
+                          type: string
+                          example: Cook beef, add vegetables, simmer for 1 hour
+                        owner:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+    post:
+      summary: Add a new recipe
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - time
+                - calories
+                - category
+                - ingredients
+                - instructions
+              properties:
+                title:
+                  type: string
+                  example: Beef Stew
+                description:
+                  type: string
+                  example: A hearty beef stew recipe
+                time:
+                  type: string
+                  example: 1 hour
+                calories:
+                  type: string
+                  example: 500 kcal
+                category:
+                  type: string
+                  enum: [Beef, Dessert]
+                  example: Beef
+                ingredients:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: ingredient123
+                      measure:
+                        type: string
+                        example: 2 cups
+                instructions:
+                  type: string
+                  example: Cook beef, add vegetables, simmer for 1 hour
+      responses:
+        '201':
+          description: Recipe successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Successfully add recipe
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      title:
+                        type: string
+                        example: Beef Stew
+                      description:
+                        type: string
+                        example: A hearty beef stew recipe
+                      favorite:
+                        type: boolean
+                        example: false
+                      time:
+                        type: string
+                        example: 1 hour
+                      calories:
+                        type: string
+                        example: 500 kcal
+                      category:
+                        type: string
+                        enum: [Beef, Dessert]
+                        example: Beef
+                      ingredients:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: ingredient123
+                            measure:
+                              type: string
+                              example: 2 cups
+                      instructions:
+                        type: string
+                        example: Cook beef, add vegetables, simmer for 1 hour
+                      owner:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid request data
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+  /recipes/{id}:
+    get:
+      summary: Get a recipe by ID
+      tags:
+        - Recipes
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Recipe ID
+      responses:
+        '200':
+          description: Recipe retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Successfully found recipe by id!
+                  data:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      title:
+                        type: string
+                        example: Beef Stew
+                      description:
+                        type: string
+                        example: A hearty beef stew recipe
+                      favorite:
+                        type: boolean
+                        example: false
+                      time:
+                        type: string
+                        example: 1 hour
+                      calories:
+                        type: string
+                        example: 500 kcal
+                      category:
+                        type: string
+                        enum: [Beef, Dessert]
+                        example: Beef
+                      ingredients:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: ingredient123
+                            measure:
+                              type: string
+                              example: 2 cups
+                      instructions:
+                        type: string
+                        example: Cook beef, add vegetables, simmer for 1 hour
+                      owner:
+                        type: string
+                        example: 507f1f77bcf86cd799439011
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe not found
+    delete:
+      summary: Delete a recipe
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Recipe ID
+      responses:
+        '204':
+          description: Recipe successfully deleted
+        '404':
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe not found
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionId
