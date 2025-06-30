@@ -23,7 +23,7 @@ const RecipesSchema = new Schema(
       default: 'Beef',
       required: true,
     },
-    ingredients: [{ id: String, measure: String }],
+    ingredients: [{ id: Schema.Types.ObjectId, measure: String }],
     instructions: {
       type: String,
       required: true,
