@@ -10,10 +10,6 @@ const RecipesSchema = new Schema(
       type: String,
       required: true,
     },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
     time: {
       type: String,
       required: true,
@@ -24,7 +20,6 @@ const RecipesSchema = new Schema(
     },
     category: {
       type: String,
-      enum: ['Beef', 'Dessert'],
       default: 'Beef',
       required: true,
     },
@@ -37,6 +32,11 @@ const RecipesSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'user',
       required: true,
+    },
+    photoUrl: {
+      type: String,
+      required: false,
+      default: null,
     },
   },
   { versionKey: false, timestamps: true },
