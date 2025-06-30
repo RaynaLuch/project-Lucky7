@@ -41,7 +41,7 @@ export const searchRecipes = async ({
   category,
   ingredient,
   page = 1,
-  limit = 10,
+  limit = 12,
 }) => {
   const skip = (page - 1) * limit;
   const filter = {};
