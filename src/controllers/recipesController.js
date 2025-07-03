@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 
 import createHttpError from 'http-errors';
+import { isValidObjectId } from 'mongoose';
 import RecipeCollection from '../db/models/recipe.js';
 import { UserCollection } from '../db/models/user.js';
 import {
@@ -111,7 +112,15 @@ export const deleteRecipeController = async (req, res, next) => {
 
 export const getRecipeByIdController = async (req, res) => {
   const id = req.params.id;
+  if (!isValidObjectId(id)) {
+    throw createHttpError(400, 'Wrong id format: is not valid ObjectId');
+  }
+
   const foundRecipe = await getRecipeById(id);
+
+  if (!foundRecipe) {
+    throw createHttpError(404, 'Recipe not found');
+  }
 
   res.status(200).json({
     status: 200,

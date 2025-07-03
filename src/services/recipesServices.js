@@ -27,13 +27,17 @@ export const addRecipes = (payload) => RecipeCollection.create(payload);
 
 export const getRecipeById = async (recipeId) => {
   const recipeById = await RecipeCollection.findById(recipeId);
-  const recipe = recipeById.toObject();
-  for (let ingredient of recipe.ingredients) {
-    const ingData = await Ingredient.findById(ingredient.id);
-    ingredient['name'] = ingData?.name;
-  }
+  if (recipeById) {
+    const recipe = recipeById.toObject();
+    for (let ingredient of recipe.ingredients) {
+      const ingData = await Ingredient.findById(ingredient.id);
+      ingredient['name'] = ingData?.name;
+    }
 
-  return recipe;
+    return recipe;
+  } else {
+    return null;
+  }
 };
 
 export const searchRecipes = async ({
