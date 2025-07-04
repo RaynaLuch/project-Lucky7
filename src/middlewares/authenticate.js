@@ -3,87 +3,60 @@ import createHttpError from 'http-errors';
 import { SessionsCollection } from '../db/models/session.js';
 import { UserCollection } from '../db/models/user.js';
 
-export const authenticate = async (req, res, next) => {
+const extractToken = (req) => {
   const authHeader = req.get('Authorization');
+  if (!authHeader) return null;
 
-  if (!authHeader) {
-    next(createHttpError(401, 'Please provide Authorization header'));
-    return;
+  const [type, token] = authHeader.split(' ');
+  if (type !== 'Bearer' || !token) return null;
+
+  return token;
+};
+
+export const authenticate = async (req, res, next) => {
+  try {
+    const token = extractToken(req);
+    if (!token) {
+      return next(createHttpError(401, 'Authorization token required'));
+    }
+
+    const session = await SessionsCollection.findOne({ accessToken: token });
+    if (!session) {
+      return next(createHttpError(401, 'Session not found'));
+    }
+
+    if (new Date() > new Date(session.accessTokenValidUntil)) {
+      return next(createHttpError(401, 'Access token expired'));
+    }
+
+    const user = await UserCollection.findById(session.userId);
+    if (!user) {
+      return next(createHttpError(401, 'User not found'));
+    }
+
+    req.user = user;
+    next();
+  } catch {
+    next(createHttpError(401, 'Authentication error'));
   }
-
-  const bearer = authHeader.split(' ')[0];
-  const token = authHeader.split(' ')[1];
-
-  if (bearer !== 'Bearer' || !token) {
-    next(createHttpError(401, 'There should be auth header of type Bearer'));
-    return;
-  }
-
-  const session = await SessionsCollection.findOne({ accessToken: token });
-
-  if (!session) {
-    next(createHttpError(401, 'Session not found'));
-    return;
-  }
-
-  const isAccessTokenExpired =
-    new Date() > new Date(session.accessTokenValidUntil);
-
-  if (isAccessTokenExpired) {
-    next(createHttpError(401, 'Access token expired'));
-  }
-
-  const user = await UserCollection.findById(session.userId);
-
-  if (!user) {
-    next(createHttpError(401));
-    return;
-  }
-
-  req.user = user;
-
-  next();
 };
 
 export const identifyUser = async (req, res, next) => {
-  const authHeader = req.get('Authorization');
+  try {
+    const token = extractToken(req);
+    if (!token) return next();
 
-  if (!authHeader) {
+    const session = await SessionsCollection.findOne({ accessToken: token });
+    if (!session) return next();
+
+    if (new Date() > new Date(session.accessTokenValidUntil)) return next();
+
+    const user = await UserCollection.findById(session.userId);
+    if (!user) return next();
+
+    req.user = user;
     next();
-    return;
-  }
-
-  const bearer = authHeader.split(' ')[0];
-  const token = authHeader.split(' ')[1];
-
-  if (bearer !== 'Bearer' || !token) {
+  } catch {
     next();
-    return;
   }
-
-  const session = await SessionsCollection.findOne({ accessToken: token });
-
-  if (!session) {
-    next();
-    return;
-  }
-
-  const isAccessTokenExpired =
-    new Date() > new Date(session.accessTokenValidUntil);
-
-  if (isAccessTokenExpired) {
-    next();
-    return;
-  }
-
-  const user = await UserCollection.findById(session.userId);
-
-  if (!user) {
-    next();
-    return;
-  }
-
-  req.user = user;
-
-  next();
 };
