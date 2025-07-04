@@ -16,6 +16,7 @@ import {
 import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
+import { log } from 'node:console';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -29,12 +30,20 @@ export const addRecipeToFavorites = async (req, res, next) => {
       return res.status(404).json({ message: 'Recipe not found' });
     }
 
-    if (!user.favorites.includes(recipeId)) {
-      user.favorites.push(recipeId);
-      await user.save();
-    }
+    if (!user.favorites?.includes(recipeId)) {
+      if (!user.favorites) {
+        user.set('favorites', [recipeId]);
+        await user.save();
+      } else {
+        user.favorites.push(recipeId);
+        console.log('user addRecipeToFavorites ', user);
 
-    res.status(200).json({ message: 'Recipe added to favorites' });
+        await user.save();
+      }
+      res.status(200).json({ message: 'Recipe added to favorites' });
+    } else {
+      res.status(400).json({ message: 'Recipe already is in favorites' });
+    }
   } catch (error) {
     next(error);
   }
