@@ -12,7 +12,7 @@ const usersSchema = new Schema(
       match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
     password: { type: String, required: true, minlength: 8, maxlength: 128 },
-    // favorites: [{ type: Schema.Types.ObjectId, ref: 'recipes' }],
+    favorites: [{ type: Schema.Types.ObjectId, ref: 'recipes' }],
     // ownRecipes: [{ type: Schema.Types.ObjectId, ref: 'recipes' }],
   },
   {
