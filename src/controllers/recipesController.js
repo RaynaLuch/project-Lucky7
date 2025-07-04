@@ -112,6 +112,10 @@ export const deleteRecipeController = async (req, res, next) => {
 
 export const getRecipeByIdController = async (req, res) => {
   const id = req.params.id;
+  //const { _id: userid } = req.user;
+  const user = req.user;
+  console.log('user', user);
+
   if (!isValidObjectId(id)) {
     throw createHttpError(400, 'Wrong id format: is not valid ObjectId');
   }
@@ -121,6 +125,9 @@ export const getRecipeByIdController = async (req, res) => {
   if (!foundRecipe) {
     throw createHttpError(404, 'Recipe not found');
   }
+
+  foundRecipe.isFavorite = false;
+  if (user?.favorites?.includes(id)) foundRecipe.isFavorite = true;
 
   res.status(200).json({
     status: 200,
