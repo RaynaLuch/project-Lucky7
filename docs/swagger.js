@@ -1,4 +1,3 @@
-
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -15,7 +14,7 @@ const options = {
         url: 'http://localhost:3000/api',
       },
       {
-        url: 'https://project-lucky7.onrender.com/api-docs',
+        url: 'https://project-lucky7.onrender.com/api',
       },
     ],
   },
