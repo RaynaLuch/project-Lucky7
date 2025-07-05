@@ -20,7 +20,6 @@ import path from 'node:path';
 import swaggerUi from 'swagger-ui-express';
 import yaml from 'yamljs';
 
-
 dotenv.config();
 
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -28,7 +27,7 @@ const PORT = Number(getEnvVar('PORT', '3000'));
 export const startServer = () => {
   const app = express();
 
-  app.use('/photoUrl', express.static(path.resolve('uploads')));
+  app.use('/thumb', express.static(path.resolve('uploads')));
 
   app.use(express.json());
   app.use(cors());
@@ -41,7 +40,7 @@ export const startServer = () => {
       },
     }),
   );
-    const swaggerDocument = yaml.load('./docs/swagger.yaml');
+  const swaggerDocument = yaml.load('./docs/swagger.yaml');
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   app.use('/api/auth', auth);

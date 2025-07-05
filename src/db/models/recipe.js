@@ -20,7 +20,6 @@ const RecipesSchema = new Schema(
     },
     category: {
       type: String,
-      default: 'Beef',
       required: true,
     },
     ingredients: [{ id: Schema.Types.ObjectId, measure: String }],
@@ -33,10 +32,11 @@ const RecipesSchema = new Schema(
       ref: 'user',
       required: true,
     },
-    photoUrl: {
+    thumb: {
       type: String,
       required: false,
-      default: null,
+      default:
+        'https://ftp.goit.study/img/so-yummy/preview/Summer%20Pistou.jpg',
     },
   },
   { versionKey: false, timestamps: true },

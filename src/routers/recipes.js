@@ -30,7 +30,7 @@ router.post(
   '/own',
   authenticate,
   validateBody(addRecipeSchema),
-  upload.single('photoUrl'),
+  upload.single('thumb'),
   ctrlWrapper(addRecipesController),
 );
 
