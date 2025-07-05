@@ -5,6 +5,8 @@ import {
   refreshUsersSession,
 } from '../services/auth.js';
 
+import { UserCollection } from '../db/models/user.js';
+
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 export const registerUserController = async (req, res) => {
@@ -13,12 +15,18 @@ export const registerUserController = async (req, res) => {
   res.status(201).json({
     status: 201,
     message: 'Successfully register user!',
-    data: user,
+    data: {
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+    },
   });
 };
 
 export const loginUserController = async (req, res) => {
   const session = await loginUser(req.body);
+  const user = await UserCollection.findById(session.userId);
 
   res.cookie('refreshToken', session.refreshToken, {
     httpOnly: true,
@@ -34,6 +42,10 @@ export const loginUserController = async (req, res) => {
     message: 'Successfully logged in an user!',
     data: {
       accessToken: session.accessToken,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
     },
   });
 };
