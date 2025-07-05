@@ -77,24 +77,24 @@ export const getOwnRecipesController = async (req, res) => {
 };
 
 export const addRecipesController = async (req, res) => {
-  let photoUrl = null;
+  let thumb = null;
 
   if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
     const result = await uploadToCloudinary(req.file.path);
 
     await fs.unlink(req.file.path);
 
-    photoUrl = result.secure_url;
+    thumb = result.secure_url;
   } else {
     await fs.rename(req.file.path, path.resolve('uploads', req.file.filename));
-    photoUrl = `http://localhost:3000/photoUrl/${req.file.filename}`;
+    thumb = `http://localhost:3000/thumb/${req.file.filename}`;
   }
 
   const { _id: owner } = req.user;
   const data = await addRecipes({
     ...req.body,
     owner,
-    photoUrl,
+    thumb,
   });
 
   res.status(201).json({
