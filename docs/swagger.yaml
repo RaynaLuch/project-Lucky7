@@ -1,4 +1,3 @@
-
 openapi: 3.0.3
 info:
   title: Recipe Website API
@@ -7,6 +6,8 @@ info:
 servers:
   - url: http://localhost:3000/api
     description: Local development server
+  - url: https://project-lucky7.onrender.com/api-docs
+    description: Production server
 paths:
   /auth/register:
     post:
@@ -299,6 +300,119 @@ paths:
                         name:
                           type: string
                           example: Tomato
+  /recipes/search:
+    get:
+      summary: Search recipes by title, category, or ingredient
+      tags:
+        - Recipes
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+            example: Beef Stew
+          description: Search term for recipe title
+        - in: query
+          name: category
+          schema:
+            type: string
+            example: Beef
+          description: Filter by category name
+        - in: query
+          name: ingredient
+          schema:
+            type: string
+            example: Tomato
+          description: Filter by ingredient name
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+            example: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 12
+            example: 12
+          description: Number of items per page
+      responses:
+        '200':
+          description: List of recipes retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 100
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 12
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        title:
+                          type: string
+                          example: Beef Stew
+                        description:
+                          type: string
+                          example: A hearty beef stew recipe
+                        favorite:
+                          type: boolean
+                          example: false
+                        time:
+                          type: string
+                          example: 1 hour
+                        calories:
+                          type: string
+                          example: 500 kcal
+                        category:
+                          type: string
+                          enum: [Beef, Dessert]
+                          example: Beef
+                        ingredients:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                example: ingredient123
+                              measure:
+                                type: string
+                                example: 2 cups
+                              name:
+                                type: string
+                                example: Tomato
+                        instructions:
+                          type: string
+                          example: Cook beef, add vegetables, simmer for 1 hour
+                        owner:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        thumb:
+                          type: string
+                          example: https://res.cloudinary.com/example/image.jpg
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: 2025-07-05T12:00:00Z
+                        updatedAt:
+                          type: string
+                          format: date-time
+                          example: 2025-07-05T12:00:00Z
   /recipes/favorites/{id}:
     post:
       summary: Add a recipe to favorites
@@ -312,6 +426,7 @@ paths:
           required: true
           schema:
             type: string
+            example: 507f1f77bcf86cd799439011
           description: Recipe ID
       responses:
         '200':
@@ -324,6 +439,16 @@ paths:
                   message:
                     type: string
                     example: Recipe added to favorites
+        '400':
+          description: Recipe already in favorites
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe already is in favorites
         '404':
           description: Recipe not found
           content:
@@ -334,6 +459,43 @@ paths:
                   message:
                     type: string
                     example: Recipe not found
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+    delete:
+      summary: Remove a recipe from favorites
+      tags:
+        - Recipes
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: 507f1f77bcf86cd799439011
+          description: Recipe ID
+      responses:
+        '204':
+          description: Recipe successfully removed from favorites
+        '404':
+          description: Recipe or user not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recipe not in favorites
         '401':
           description: Unauthorized
           content:
@@ -394,18 +556,26 @@ paths:
                           measure:
                             type: string
                             example: 2 cups
+                          name:
+                            type: string
+                            example: Tomato
                     instructions:
                       type: string
                       example: Cook beef, add vegetables, simmer for 1 hour
                     owner:
                       type: string
                       example: 507f1f77bcf86cd799439011
+                    thumb:
+                      type: string
+                      example: https://res.cloudinary.com/example/image.jpg
                     createdAt:
                       type: string
                       format: date-time
+                      example: 2025-07-05T12:00:00Z
                     updatedAt:
                       type: string
                       format: date-time
+                      example: 2025-07-05T12:00:00Z
         '401':
           description: Unauthorized
           content:
@@ -429,12 +599,14 @@ paths:
           schema:
             type: integer
             default: 1
+            example: 1
           description: Page number for pagination
         - in: query
           name: perPage
           schema:
             type: integer
             default: 10
+            example: 10
           description: Number of items per page
       responses:
         '200':
@@ -488,18 +660,35 @@ paths:
                               measure:
                                 type: string
                                 example: 2 cups
+                              name:
+                                type: string
+                                example: Tomato
                         instructions:
                           type: string
                           example: Cook beef, add vegetables, simmer for 1 hour
                         owner:
                           type: string
                           example: 507f1f77bcf86cd799439011
+                        thumb:
+                          type: string
+                          example: https://res.cloudinary.com/example/image.jpg
                         createdAt:
                           type: string
                           format: date-time
+                          example: 2025-07-05T12:00:00Z
                         updatedAt:
                           type: string
                           format: date-time
+                          example: 2025-07-05T12:00:00Z
+                  totalPages:
+                    type: integer
+                    example: 5
+                  currentPage:
+                    type: integer
+                    example: 1
+                  totalItems:
+                    type: integer
+                    example: 50
         '401':
           description: Unauthorized
           content:
@@ -519,7 +708,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
@@ -561,6 +750,10 @@ paths:
                 instructions:
                   type: string
                   example: Cook beef, add vegetables, simmer for 1 hour
+                thumb:
+                  type: string
+                  format: binary
+                  description: Image file for the recipe
       responses:
         '201':
           description: Recipe successfully added
@@ -611,18 +804,26 @@ paths:
                             measure:
                               type: string
                               example: 2 cups
+                            name:
+                              type: string
+                              example: Tomato
                       instructions:
                         type: string
                         example: Cook beef, add vegetables, simmer for 1 hour
                       owner:
                         type: string
                         example: 507f1f77bcf86cd799439011
+                      thumb:
+                        type: string
+                        example: https://res.cloudinary.com/example/image.jpg
                       createdAt:
                         type: string
                         format: date-time
+                        example: 2025-07-05T12:00:00Z
                       updatedAt:
                         type: string
                         format: date-time
+                        example: 2025-07-05T12:00:00Z
         '400':
           description: Invalid request data
           content:
@@ -654,6 +855,7 @@ paths:
           required: true
           schema:
             type: string
+            example: 507f1f77bcf86cd799439011
           description: Recipe ID
       responses:
         '200':
@@ -684,6 +886,9 @@ paths:
                       favorite:
                         type: boolean
                         example: false
+                      isFavorite:
+                        type: boolean
+                        example: true
                       time:
                         type: string
                         example: 1 hour
@@ -705,18 +910,36 @@ paths:
                             measure:
                               type: string
                               example: 2 cups
+                            name:
+                              type: string
+                              example: Tomato
                       instructions:
                         type: string
                         example: Cook beef, add vegetables, simmer for 1 hour
                       owner:
                         type: string
                         example: 507f1f77bcf86cd799439011
+                      thumb:
+                        type: string
+                        example: https://res.cloudinary.com/example/image.jpg
                       createdAt:
                         type: string
                         format: date-time
+                        example: 2025-07-05T12:00:00Z
                       updatedAt:
                         type: string
                         format: date-time
+                        example: 2025-07-05T12:00:00Z
+        '400':
+          description: Invalid recipe ID format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Wrong id format: is not valid ObjectId
         '404':
           description: Recipe not found
           content:
@@ -739,6 +962,7 @@ paths:
           required: true
           schema:
             type: string
+            example: 507f1f77bcf86cd799439011
           description: Recipe ID
       responses:
         '204':
@@ -769,3 +993,6 @@ components:
       type: apiKey
       in: cookie
       name: sessionId
+
+
+

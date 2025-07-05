@@ -14,9 +14,12 @@ const options = {
       {
         url: 'http://localhost:3000/api',
       },
+      {
+        url: 'https://project-lucky7.onrender.com/api-docs',
+      },
     ],
   },
-  apis: ['./routers/*.js', './controllers/*.js', './validation/*.js'], // шлях до файлів з JSDoc
+  apis: ['./routers/*.js', './controllers/*.js', './validation/*.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
