@@ -71,11 +71,14 @@ const setupSession = (res, session) => {
   });
 };
 
-export const refreshUserSessionController = async (req, res) => {
-  const session = await refreshUsersSession({
-    sessionId: req.cookies.sessionId,
-    refreshToken: req.cookies.refreshToken,
-  });
+export const refreshUserSessionController = async (req, res, next) => {
+  const { sessionId, refreshToken } = req.body;
+  if (!sessionId || !refreshToken) {
+    return res
+      .status(400)
+      .json({ status: 400, message: 'sessionId & refreshToken required' });
+  }
+  const session = await refreshUsersSession({ sessionId, refreshToken });
 
   setupSession(res, session);
 
