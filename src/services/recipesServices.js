@@ -34,6 +34,10 @@ export const getRecipeById = async (recipeId) => {
       ingredient['name'] = ingData?.name;
     }
 
+    if (recipe.thumb.search('https://ftp') > -1) {
+      recipe.thumb = recipe.thumb.replace('preview', 'preview/large');
+    }
+
     return recipe;
   } else {
     return null;
