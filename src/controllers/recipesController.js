@@ -16,7 +16,7 @@ import {
 import { uploadToCloudinary } from '../utils/uploadToCloudinary.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
-import { log } from 'node:console';
+// import { log } from 'node:console';
 
 export const addRecipeToFavorites = async (req, res, next) => {
   try {
@@ -81,9 +81,7 @@ export const addRecipesController = async (req, res) => {
 
   if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
     const result = await uploadToCloudinary(req.file.path);
-
     await fs.unlink(req.file.path);
-
     thumb = result.secure_url;
   } else {
     await fs.rename(req.file.path, path.resolve('uploads', req.file.filename));
@@ -91,15 +89,28 @@ export const addRecipesController = async (req, res) => {
   }
 
   const { _id: owner } = req.user;
+  const { ingredients, ...rest } = req.body;
+
+  let parsedIngredients;
+  try {
+    parsedIngredients = JSON.parse(ingredients);
+  } catch (err) {
+    return res.status(400).json({
+      status: 400,
+      message: 'Invalid ingredients format.',
+    });
+  }
+
   const data = await addRecipes({
-    ...req.body,
+    ...rest,
+    ingredients: parsedIngredients,
     owner,
     thumb,
   });
 
   res.status(201).json({
     status: 201,
-    message: 'Successfully add recipe',
+    message: 'Successfully added recipe',
     data,
   });
 };
