@@ -106,16 +106,17 @@ export const refreshUserSessionController = async (req, res, next) => {
     }
 
     const session = await refreshUsersSession({ sessionId, refreshToken });
+
     if (!session) {
       return res.status(401).json({ message: 'Invalid session' });
     }
-
-    setupSession(res, session);
 
     const user = await UserCollection.findById(session.userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    setupSession(res, session);
 
     res.json({
       status: 200,

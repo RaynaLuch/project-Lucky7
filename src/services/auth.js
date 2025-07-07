@@ -54,7 +54,6 @@ export const logoutUser = async (sessionId) => {
 };
 
 export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
-  console.log('FOUND SESSION:', session);
   const session = await SessionsCollection.findOne({
     _id: sessionId,
     refreshToken,
