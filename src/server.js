@@ -26,10 +26,6 @@ const PORT = Number(getEnvVar('PORT', '3000'));
 
 export const startServer = () => {
   const app = express();
-  const whitelist = [
-    'https://project-lucky7-front.vercel.app',
-    'http://localhost:5173',
-  ];
 
   app.use('/thumb', express.static(path.resolve('uploads')));
 
@@ -37,21 +33,10 @@ export const startServer = () => {
 
   app.use(
     cors({
-      origin: (origin, callback) => {
-        if (!origin || whitelist.includes(origin)) {
-          return callback(null, true);
-        }
-        return callback(new Error('Not allowed by CORS'));
-      },
+      origin: 'https://project-lucky7-front.vercel.app',
       credentials: true,
     }),
   );
-  // app.use(
-  //   cors({
-  //     origin: 'https://project-lucky7-front.vercel.app',
-  //     credentials: true,
-  //   }),
-  // );
   app.use(cookieParser());
 
   app.use(
