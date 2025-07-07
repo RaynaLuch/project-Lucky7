@@ -32,7 +32,7 @@ export const startServer = () => {
   app.use(express.json());
   app.use(
     cors({
-      origin: 'https://project-lucky7-front.vercel.app/',
+      origin: 'https://project-lucky7-front.vercel.app',
       credentials: true,
     }),
   );
