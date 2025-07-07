@@ -36,8 +36,6 @@ export const addRecipeToFavorites = async (req, res, next) => {
         await user.save();
       } else {
         user.favorites.push(recipeId);
-        console.log('user addRecipeToFavorites ', user);
-
         await user.save();
       }
       res.status(200).json({ message: 'Recipe added to favorites' });
@@ -135,7 +133,6 @@ export const getRecipeByIdController = async (req, res) => {
   const id = req.params.id;
   //const { _id: userid } = req.user;
   const user = req.user;
-  console.log('user', user);
 
   if (!isValidObjectId(id)) {
     throw createHttpError(400, 'Wrong id format: is not valid ObjectId');
