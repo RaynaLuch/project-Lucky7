@@ -8,7 +8,7 @@ import { SessionsCollection } from '../db/models/session.js';
 const FIFTEEN_MINUTES = 15 * 60 * 1000;
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
-const createSession = () => {
+export const createSession = () => {
   const accessToken = randomBytes(30).toString('base64');
   const refreshToken = randomBytes(30).toString('base64');
 
@@ -54,6 +54,7 @@ export const logoutUser = async (sessionId) => {
 };
 
 export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
+  console.log('FOUND SESSION:', session);
   const session = await SessionsCollection.findOne({
     _id: sessionId,
     refreshToken,

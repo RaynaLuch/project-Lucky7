@@ -94,8 +94,9 @@ export const addRecipesController = async (req, res) => {
   let parsedIngredients;
   try {
     parsedIngredients = JSON.parse(ingredients);
-  } catch (err) {
+  } catch (error) {
     return res.status(400).json({
+      error: error,
       status: 400,
       message: 'Invalid ingredients format.',
     });

@@ -30,7 +30,12 @@ export const startServer = () => {
   app.use('/thumb', express.static(path.resolve('uploads')));
 
   app.use(express.json());
-  app.use(cors());
+  app.use(
+    cors({
+      origin: 'https://project-lucky7-front.vercel.app/',
+      credentials: true,
+    }),
+  );
   app.use(cookieParser());
 
   app.use(
