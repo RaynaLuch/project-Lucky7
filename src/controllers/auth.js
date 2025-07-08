@@ -40,8 +40,8 @@ export const registerUserController = async (req, res, next) => {
       },
     });
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({ message: 'Email already exists' });
+    if (error.status === 409) {
+      return res.status(409).json({ message: error.message });
     }
     next(error);
   }
