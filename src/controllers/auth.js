@@ -7,6 +7,7 @@ import {
 } from '../services/auth.js';
 
 import { UserCollection } from '../db/models/user.js';
+import { SessionsCollection } from '../db/models/session.js';
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -14,8 +15,10 @@ export const registerUserController = async (req, res, next) => {
   try {
     const user = await registerUser(req.body);
 
-    const session = await createSession(user._id);
-    const accessToken = session.accessToken;
+    const session = await SessionsCollection.create({
+      userId: user._id,
+      ...createSession(),
+    });
 
     res.cookie('refreshToken', session.refreshToken, {
       httpOnly: true,
@@ -30,7 +33,7 @@ export const registerUserController = async (req, res, next) => {
       status: 201,
       message: 'Successfully registered user!',
       data: {
-        accessToken,
+        accessToken: session.accessToken,
         refreshToken: session.refreshToken,
         sessionId: session._id,
         user: {
